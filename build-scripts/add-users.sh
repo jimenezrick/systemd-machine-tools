@@ -11,4 +11,4 @@ cat >/etc/sudoers.d/wheel-nopasswd <<EOF
 EOF
 
 passwd --delete root
-printf 'pts/%d\n' {1..9} >>/etc/securetty
+printf 'pts/%d\n' {0..9} >>/etc/securetty
