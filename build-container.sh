@@ -4,11 +4,11 @@ set -eu
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-BASE_PKGS=(base base-devel devtools)
+BASE_PKGS=(base base-devel devtools bash-completion)
 BASE_ROOTFS=pacstrap
 TARGET_PKGS=()
 TARGET_AUR_PKGS=()
-CONTAINER=arch-container
+CONTAINER=
 
 usage() {
 	cat <<EOF
@@ -97,6 +97,11 @@ parse_opts "$@"
 if [[ $(whoami) != "root" ]]
 then
 	die "error: needs to be run as root"
+fi
+
+if [[ -z $CONTAINER ]]
+then
+	die "error: container name not specified"
 fi
 
 # Bootstrap rootfs
