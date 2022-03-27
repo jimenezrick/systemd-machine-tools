@@ -4,7 +4,7 @@ set -eu
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-BASE_PKGS=(base base-devel devtools bash-completion)
+BASE_PKGS=(base base-devel devtools bash-completion vi)
 BASE_ROOTFS=pacstrap
 TARGET_PKGS=()
 TARGET_AUR_PKGS=()
