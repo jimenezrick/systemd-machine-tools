@@ -2,6 +2,9 @@
 
 set -eu
 
+install -d -o photoview -g photoview /home/photoview
+usermod --home /home/photoview photoview
+
 ln -s /usr/bin/vendor_perl/exiftool /usr/bin/exiftool
 
 cat >/etc/photoview.env <<EOF
