@@ -1,0 +1,8 @@
+[Network]
+VirtualEthernet=no
+
+[Exec]
+PrivateUsers=no
+
+[Files]
+BindReadOnly=/home/ricardo/photos:/photos

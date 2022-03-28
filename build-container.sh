@@ -8,16 +8,18 @@ BASE_PKGS=(base base-devel devtools bash-completion vi)
 BASE_ROOTFS=pacstrap
 TARGET_PKGS=()
 TARGET_AUR_PKGS=()
+SETUP_SCRIPTS=()
 CONTAINER=
 
 usage() {
 	cat <<EOF
-Usage: $0 [-c <container_name>] [-r] [-p <pacman_pkg>] [-a <aur_pkg>] ...
+Usage: $0 [-c <container_name>] [-r] [-p <pacman_pkg>] [-a <aur_pkg>] [-s <setup_script>] ...
 
     -c Name of the container rootfs directory
     -r Download the official bootstrap rootfs as base
     -p Install target package from official repositories
     -a Install target package from AUR
+    -s Run setup script inside the container
 EOF
 	exit 0
 }
@@ -70,6 +72,9 @@ parse_opts() {
 			a)
 				TARGET_AUR_PKGS+=($OPTARG)
 				;;
+			s)
+				SETUP_SCRIPTS+=($OPTARG)
+				;;
 			?)
 				die "error: invalid option"
 				;;
@@ -90,6 +95,11 @@ fetch_bootstrap_rootfs() {
 
 	tar xf $image
 	mv -v root.x86_64 $CONTAINER
+}
+
+run_setup_script() {
+	cp -v $1 $CONTAINER/build-scripts/setup/
+	run $CONTAINER /build-scripts/setup/$1
 }
 
 parse_opts "$@"
@@ -119,6 +129,8 @@ case $BASE_ROOTFS in
 		;;
 esac
 
+mkdir -p $CONTAINER/build-scripts/setup
+
 # Prepare container
 run $CONTAINER /build-scripts/add-users.sh
 run_as_from $CONTAINER builder /home/builder /build-scripts/install-aurutils.sh
@@ -126,6 +138,12 @@ run_as_from $CONTAINER builder /home/builder /build-scripts/install-aurutils.sh
 # Install packages
 run_as $CONTAINER builder /build-scripts/build-aur-pkgs.sh "${TARGET_AUR_PKGS[@]}"
 run $CONTAINER pacman -S --noconfirm "${TARGET_PKGS[@]}" "${TARGET_AUR_PKGS[@]}"
+
+# Setup container
+for script in "${SETUP_SCRIPTS[@]}"
+do
+	run_setup_script $script
+done
 
 # Cleanup
 run $CONTAINER /build-scripts/cleanup.sh
