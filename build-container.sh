@@ -54,7 +54,7 @@ run_as_from() {
 }
 
 parse_opts() {
-	while getopts 'hc:rp:a:' OPTFLAG
+	while getopts 'hrc:s:p:a:' OPTFLAG
 	do
 		case ${OPTFLAG} in
 			h)
