@@ -2,10 +2,6 @@
 
 set -eu
 
-cat >/bin/hello <<EOF
-#!/bin/bash
 
-echo 'Hello world!'
-EOF
-
+install /tmp/test/hello /bin
 chmod 755 /bin/hello

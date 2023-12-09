@@ -5,6 +5,7 @@ set -eu
 SCRIPT_DIR_REL=$(dirname ${BASH_SOURCE[0]})
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
 
+EXTRA_NSPAWN_ARGS=
 BASE_PKGS=(sudo bash-completion vi wget --ignore linux)
 BASE_ROOTFS=pacstrap
 TARGET_PKGS=()
@@ -14,13 +15,15 @@ CONTAINER=
 
 usage() {
 	cat <<EOF
-Usage: $0 [-c <container_name>] [-r] [-p <pacman_pkg>] [-a <aur_pkg>] [-s <setup_script>] ...
+Usage: $0 [-c <container_name>] [-e <extra_nspawn_args>] [-r] [-p <pacman_pkg>...] [-a <aur_pkg>...] [-s <setup_script>...]
 
     -c Name of the container rootfs directory
+    -e Extra arguments for systemd-nspawn
     -r Download the official bootstrap rootfs as base
     -p Install target package from official repositories
     -a Install target package from AUR
     -s Run setup script inside the container
+    -h Print this help
 EOF
 	exit 0
 }
@@ -59,7 +62,7 @@ run_as_from() {
 }
 
 parse_opts() {
-	while getopts 'hrc:s:p:a:' OPTFLAG
+	while getopts 'hrc:e:s:p:a:' OPTFLAG
 	do
 		case ${OPTFLAG} in
 			h)
@@ -67,6 +70,9 @@ parse_opts() {
 				;;
 			c)
 				CONTAINER=$OPTARG
+				;;
+			e)
+				EXTRA_NSPAWN_ARGS=$OPTARG
 				;;
 			r)
 				BASE_ROOTFS=archive
@@ -104,7 +110,7 @@ fetch_bootstrap_rootfs() {
 
 run_setup_script() {
 	cp -v $1 $CONTAINER/build-scripts/setup/
-	run $CONTAINER /build-scripts/setup/$1
+	run $CONTAINER $EXTRA_NSPAWN_ARGS /build-scripts/setup/$1
 }
 
 parse_opts "$@"
