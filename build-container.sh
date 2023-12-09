@@ -2,9 +2,10 @@
 
 set -eu
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR_REL=$(dirname ${BASH_SOURCE[0]})
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
 
-BASE_PKGS=(base base-devel devtools bash-completion vi)
+BASE_PKGS=(sudo bash-completion vi wget --ignore linux)
 BASE_ROOTFS=pacstrap
 TARGET_PKGS=()
 TARGET_AUR_PKGS=()
@@ -22,6 +23,10 @@ Usage: $0 [-c <container_name>] [-r] [-p <pacman_pkg>] [-a <aur_pkg>] [-s <setup
     -s Run setup script inside the container
 EOF
 	exit 0
+}
+
+info() {
+	echo '[*]=>' "$@"
 }
 
 die() {
@@ -61,7 +66,7 @@ parse_opts() {
 				usage
 				;;
 			c)
-				CONTAINER=($OPTARG)
+				CONTAINER=$OPTARG
 				;;
 			r)
 				BASE_ROOTFS=archive
@@ -83,7 +88,7 @@ parse_opts() {
 }
 
 fetch_bootstrap_rootfs() {
-	local version=$(date +%Y.%m.01)
+	local -r version=$(date +%Y.%m.01)
 	local mirror=https://lon.mirror.rackspace.com
 	local image=archlinux-bootstrap-$version-x86_64.tar.gz
 	local url=$mirror/archlinux/iso/$version/$image
@@ -117,14 +122,16 @@ fi
 # Bootstrap rootfs
 case $BASE_ROOTFS in
 	archive)
+		info "Fetching base rootfs tarball"
 		fetch_bootstrap_rootfs
 		cp -rv $SCRIPT_DIR/build-scripts/ $CONTAINER/
 		run $CONTAINER /build-scripts/prepare-rootfs.sh
 		run $CONTAINER pacman -S --noconfirm ${BASE_PKGS[@]}
 		;;
 	pacstrap)
+		info "Bootstrapping base rootfs"
 		mkdir -p $CONTAINER
-		pacstrap -c $CONTAINER ${BASE_PKGS[@]}
+		pacstrap -c $CONTAINER base ${BASE_PKGS[@]}
 		cp -rv $SCRIPT_DIR/build-scripts/ $CONTAINER/
 		;;
 esac
@@ -132,18 +139,23 @@ esac
 mkdir -p $CONTAINER/build-scripts/setup
 
 # Prepare container
+info "Preparing container"
 run $CONTAINER /build-scripts/add-users.sh
-run_as_from $CONTAINER builder /home/builder /build-scripts/install-aurutils.sh
+run $CONTAINER /build-scripts/install-paru.sh
 
 # Install packages
-run_as $CONTAINER builder /build-scripts/build-aur-pkgs.sh "${TARGET_AUR_PKGS[@]}"
-run $CONTAINER pacman -S --noconfirm "${TARGET_PKGS[@]}" "${TARGET_AUR_PKGS[@]}"
+info "Installing in container official packages"
+run $CONTAINER pacman -S --noconfirm "${TARGET_PKGS[@]}"
+info "Installing in container AUR packages"
+run $CONTAINER /build-scripts/install-aur-pkgs.sh "${TARGET_AUR_PKGS[@]}"
 
 # Setup container
+info "Running container setup scripts"
 for script in "${SETUP_SCRIPTS[@]}"
 do
 	run_setup_script $script
 done
 
 # Cleanup
+info "Cleaning up container"
 run $CONTAINER /build-scripts/cleanup.sh

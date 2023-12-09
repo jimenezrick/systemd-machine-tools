@@ -2,5 +2,5 @@
 
 set -eu
 
-sudo ../build-container.sh -r -c test-hello -s setup-test-hello.sh \
+sudo ../../build-container.sh -r -c test-hello-rootfs -s setup-test-hello.sh \
      -p curl

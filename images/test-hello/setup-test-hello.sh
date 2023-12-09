@@ -8,4 +8,4 @@ cat >/bin/hello <<EOF
 echo 'Hello world!'
 EOF
 
-chmod +755 /bin/hello
+chmod 755 /bin/hello
