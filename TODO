@@ -1,0 +1,5 @@
+- Use for AUR instead: https://github.com/Morganamilo/paru
+- Allow passing extra args to systemd-nspawn (for --bind-ro eg)
+  -e "-bind-ro foo:bar"
+  systemd-nspawn ... $(eval $EXTRA_ARGS)
+- Use archlinux bootstrap tgz as base layer (BTRFS?) for other images?
