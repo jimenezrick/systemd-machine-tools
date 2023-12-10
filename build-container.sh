@@ -6,7 +6,7 @@ SCRIPT_DIR_REL=$(dirname ${BASH_SOURCE[0]})
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
 
 EXTRA_NSPAWN_ARGS=
-BASE_PKGS=(sudo bash-completion vi wget --ignore linux)
+BASE_PKGS=(sudo wget bash-completion vi --ignore linux)
 BASE_ROOTFS=pacstrap
 TARGET_PKGS=()
 TARGET_AUR_PKGS=()
@@ -124,6 +124,10 @@ if [[ -z $CONTAINER ]]
 then
 	die "error: container name not specified"
 fi
+if [[ -d $CONTAINER ]]
+then
+	die "error: container $CONTAINER rootfs already exists"
+fi
 
 # Bootstrap rootfs
 case $BASE_ROOTFS in
@@ -150,10 +154,16 @@ run $CONTAINER /build-scripts/add-users.sh
 run $CONTAINER /build-scripts/install-paru.sh
 
 # Install packages
-info "Installing in container official packages"
-run $CONTAINER pacman -S --noconfirm "${TARGET_PKGS[@]}"
-info "Installing in container AUR packages"
-run $CONTAINER /build-scripts/install-aur-pkgs.sh "${TARGET_AUR_PKGS[@]}"
+if [[ "${#TARGET_PKGS[@]}" != 0 ]]
+then
+	info "Installing Pacman packages in container"
+	run $CONTAINER pacman -S --noconfirm "${TARGET_PKGS[@]}"
+fi
+if [[ "${#TARGET_AUR_PKGS[@]}" != 0 ]]
+then
+	info "Installing AUR packages in container"
+	run $CONTAINER /build-scripts/install-aur-pkgs.sh "${TARGET_AUR_PKGS[@]}"
+fi
 
 # Setup container
 info "Running container setup scripts"
@@ -165,3 +175,5 @@ done
 # Cleanup
 info "Cleaning up container"
 run $CONTAINER /build-scripts/cleanup.sh
+
+info "Container $CONTAINER build finished"
