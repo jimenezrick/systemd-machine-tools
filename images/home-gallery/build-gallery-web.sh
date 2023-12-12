@@ -2,7 +2,7 @@
 
 set -eu
 
-VERSION=1.14.2
+VERSION=1.14.3
 BIN=home-gallery-${VERSION}-linux-x64
 URL=https://dl.home-gallery.org/dist/${VERSION}/${BIN}
 
@@ -11,6 +11,11 @@ then
 	curl -L $URL -o build/gallery
 fi
 
+PHOTOS_PATH=~/DARKROOM
+
 sudo ../../build-container.sh -r -c gallery-web-rootfs \
      -e '--bind-ro=build:/build' \
-     -s setup-gallery-web.sh
+     -e "--bind-ro=$PHOTOS_PATH:/photos" \
+     -e '--bind=web:/web' \
+     -s setup-gallery-web.sh \
+     -p perl

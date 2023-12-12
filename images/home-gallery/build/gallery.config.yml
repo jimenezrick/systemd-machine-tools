@@ -42,10 +42,12 @@
 # different databases or gallery instances use different gallery
 # configurations
 sources:
-  - dir: '{baseDir}/Pictures'
+  - dir: '/photos'
     #index: '{configDir}/{configPrefix}{basename(dir)}.idx'
     # excludes are using gitignore patterns
-    #excludes:
+    excludes:
+      - '*.CR3'
+      - '*.xmp'
       #- .DS_Store
       #- ._*
       #- '*.tmp'
@@ -57,7 +59,7 @@ sources:
     # If source directory/disk is offline/unmounted set it to true.
     # Offline sources require an index file. Previews and meta data
     # should be extracted first before marking a source offline
-    #offline: false
+    offline: false
     # Filename matcher for checksum recalculation
     # size-ctime-inode: this matcher should be used if possible, might
     #                   not work on windows
@@ -69,11 +71,11 @@ sources:
 #
 # Extractor settings
 #
-#extractor:
+extractor:
   # Preview image settings
-  #image:
-  #  previewSizes: [1920, 1280, 800, 320, 128]
-  #  previewQuality: 80
+  image:
+    previewSizes: [3840, 1280, 800, 320, 128]
+    previewQuality: 99
   #video:
   #  previewSize: 720 # used as preview size and preview filename
   #  ext: mp4 # used as target video container and preview filename
@@ -87,14 +89,14 @@ sources:
   #  addFfmpegArgs: [...] # Additional ffmpeg args
   #  customFfmpegArgs: [...] # custom ffmpeg args for video conversion, replaces all other settings such previewSize, videoEncoder, addFfmpegArgs, ...
   # Api Server is used for image similarity, object and face detection
-  #apiServer:
+  apiServer:
   #  url: https://api.home-gallery.org
   #  timeout: 30
   #  concurrent: 5,
-  #  disable:
-  #    - similarDetection
-  #    - objectDetection
-  #    - faceDetection
+    disable:
+      - similarDetection
+      - objectDetection
+      - faceDetection
   #geoReverse:
   #  url: https://nominatim.openstreetmap.org
   #   Preffered address language of geo code reverse lookups
