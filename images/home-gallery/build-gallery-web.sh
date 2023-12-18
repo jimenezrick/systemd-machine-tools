@@ -11,7 +11,7 @@ then
 	curl -L $URL -o build/gallery
 fi
 
-PHOTOS_PATH=~/DARKROOM
+PHOTOS_PATH=~/photos/2023-12
 
 sudo ../../build-container.sh -r -c gallery-web-rootfs \
      -e '--bind-ro=build:/build' \
