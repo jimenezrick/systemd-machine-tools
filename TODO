@@ -1,3 +1,2 @@
 - Use archlinux bootstrap tgz as base layer (BTRFS?) for other images?
 - Update home-gallery script (not rebuild container)
-- Make home-gallery follow symlinks (open issue)
