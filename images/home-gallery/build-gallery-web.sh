@@ -2,7 +2,7 @@
 
 set -eu
 
-VERSION=1.14.3
+VERSION=1.14.5
 BIN=home-gallery-${VERSION}-linux-x64
 URL=https://dl.home-gallery.org/dist/${VERSION}/${BIN}
 
