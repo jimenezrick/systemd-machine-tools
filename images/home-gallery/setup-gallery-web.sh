@@ -7,7 +7,7 @@ install --directory --owner=user --group=user /home/user/{.config/home-gallery,.
 install --mode=644 --owner=user --group=user /build/gallery.config.yml /home/user/.config/home-gallery/gallery.config.yml
 
 # For debugging:
-bash
+#bash
 
 sudo -u user gallery run import
 sudo -u user -i gallery export static -d .config/home-gallery/database.db -s .cache/home-gallery/storage -o /web/gallery
