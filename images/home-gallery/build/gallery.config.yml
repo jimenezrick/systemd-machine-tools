@@ -43,6 +43,7 @@
 # configurations
 sources:
   - dir: '/photos/photos/2023-12'
+  - dir: '/photos/photos/2024-02'
     #index: '{configDir}/{configPrefix}{basename(dir)}.idx'
     # excludes are using gitignore patterns
     #excludes:
